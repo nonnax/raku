@@ -28,6 +28,12 @@ built-in Rack::Static middlewares can be redefined with ```use```:
       "hoho home : #{params}"
     end
 
+define status handlers with ```handle```
+
+    handle 404 do
+      halt [404, {}, ['Whoa! Bonkers!']]
+    end
+
 define anonymous apps with ```map```
 
     map('/inner'){ run ->(env){[200, {}, ['Inner space!']]}}
