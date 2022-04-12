@@ -6,11 +6,9 @@ D=Object.method(:define_method)
 module Raku  
   extend Forwardable
   def_delegators :stack, :map, :use
-  maps=Hash[]
-  D.(:mapping){ maps }
-  %w(GET POST PUT DELETE).map do |m| D.(m.downcase){ |*u, &block| u.flatten.each{|x| maps[[m, x]]=block } } end
-  def self.call(env) @app.call(env)  end
-  def self.new() stack.run App.new; stack end
+  D.(:mapping){ maps ||= Hash[] }
+  %w(GET POST PUT DELETE).map do |m| D.(m.downcase){ |*u, &block| u.flatten.each{|x| mapping[[m, x]]=block } } end
+  def self.new() stack.run App.new end
   def self.stack() @stack ||= Rack::Builder.new{ use Rack::Static, urls: %w[/images /js /css], root: 'public' } end
   class App
     attr :res, :req, :env
@@ -21,9 +19,7 @@ module Raku
         body ? res.finish : not_found
       }
     end
-    def call(env)
-      dup._call(env)
-    end
+    def call(env) dup._call(env) end
     def not_found() [404, {}, ['Not Found']] end
     def halt(res) throw :halt, res end      # bypass
   end
