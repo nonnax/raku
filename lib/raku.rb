@@ -10,14 +10,14 @@ module Raku
   D.(:mapping){ maps ||= Hash[] }
   D.(:handle){ |status, &block| handler[status]=block }
   D.(:handler){ handlers ||= Hash.new{|h,k| h[k]=->(){} }}
-  %w(GET POST PUT DELETE).map do |m| D.(m.downcase){ |*u, &block| u.flatten.each{|x| mapping[[m, x]]=block } } end
+  %w(GET POST PUT DELETE).map do |m| D.(m.downcase){ |*u, &block| u.flatten.map{|x| mapping[[m, x]]=block } } end
   def self.new() stack.run App.new end
   def self.stack() @stack ||= Rack::Builder.new{ use Rack::Static, urls: %w[/images /js /css], root: 'public' } end
   class App
     attr :res, :req, :env
     def _call(env)
       catch(:halt) {
-        @req, @res, @nv=Rack::Request.new(env), Rack::Response.new, env
+        @req, @res, @env=Rack::Request.new(env), Rack::Response.new, env
         res.write(body=instance_exec(
           req.params.transform_keys(&:to_sym), &::Raku.mapping[env.values_at('REQUEST_METHOD', 'PATH_INFO')]) rescue nil )
         body ? res.finish : not_found 

@@ -12,7 +12,7 @@ handle 404 do
 end
 
 get('/', '/home', '/about') do |params|
-  "hoho home : #{params}"
+  "hoho home : #{params} #{env} #{res} #{req}"
 end
 
 get('/bonkers') do
