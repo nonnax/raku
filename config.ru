@@ -12,6 +12,16 @@ get('/', '/home', '/about') do |params|
   "hoho home : #{params}"
 end
 
+get('/bonkers') do
+  res.status=401
+  res.write 'Bonkers!'
+  halt res.finish
+end
+get '/red' do
+  res.redirect '/bonkers'
+  halt res.finish
+end
+
 post('/', '/home', '/about') do |params|
   "hoho home : #{params}"
 end
